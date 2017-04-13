@@ -8,7 +8,7 @@
 
 ```
 <li>
-	<a href="../images/dog.jpg" title="A dog with glasses" onclick="showPic(this);return false;">dog</a>
+	<a href="../images/dog.jpg" onclick="showPic(this);return false;">dog</a>
 </li>
 ```
 
