@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>简单图片库</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+	<div id="gallery">
+		<h1>Snapshots</h1>
+		<ul class="gallery_list">
+			<li>
+				<a href="../images/Angelababy.jpg" title="Angelababy photo" onclick="showPic(this);return false;">Angelababy</a>
+			</li>
+			<li>
+				<a href="../images/pengyuyan.jpg" title="Eddie Peng photo" onclick="showPic(this);return false;">Eddie Peng</a>
+			</li>
+			<li>
+				<a href="../images/dog.jpg" title="A dog with glasses" onclick="showPic(this);return false;">dog</a>
+			</li>
+			<li>
+				<a href="../images/running.jpg" title="Running photo" onclick="showPic(this);return false;">Running</a>
+			</li>
+		</ul>
+
+		<img id="placeholder" src="../images/preview_image.png" alt="my image gallery" class="preview_image">
+		<p id="picTitle">图片名称</p>
+	</div>
+	<script src="script/showPic.js"></script>
+</body>
+</html>
