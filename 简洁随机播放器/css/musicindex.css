@@ -216,13 +216,13 @@ span.loved {
 	color: #414141;
 }
 .m-play {
-	background-image: url(../images/暂停.png);
+	background-image: url(../images/播放.png);
 	background-repeat: no-repeat;
 	background-position: center;
 	background-size:20px 20px;
 }
 .m-pause {
-	background-image: url(../images/播放.png);
+	background-image: url(../images/暂停.png);
 	background-repeat: no-repeat;
 	background-position: center;
 	background-size:20px 20px;
