@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<span style="font-size:18px;"><div>
+ <h4 id="name">Beyond - 光辉岁月</h4>
+ <br>
+<audio id="audio" src="music/Beyond - 光辉岁月.mp3" controls autoplay="true"></audio><br/>
+</div>
+<br><br>
+<div>
+<button id="btn-play" >播放</button>
+<button id="btn-stop" >暂停</button>
+<button id="btn-pre" >上一首</button>
+<button id="btn-next" >下一首</button>
+</div>
+</div></span>
+<script type="text/javascript">
+	<span style="font-size:18px;"><!--播放-->
+	var btn1 = document.getElementById("btn-play");
+	    btn1.onclick = function(){
+	         if(audio.paused){
+	            audio.play();
+	        }
+	    }
+
+	<!--暂停-->
+	var btn2 = document.getElementById("btn-stop");
+	    btn2.onclick = function(){
+	         if(audio.played){
+	            audio.pause();
+	        }
+	    }
+
+	var music = new Array();
+	music = ["李玉刚 - 刚好遇见你","张杰 - 三生三世","朴树 - 平凡之路"];//歌单
+	var num = 0;
+	var name = document.getElementById("name");
+
+
+	<!--上一首-->
+	var btn3 = document.getElementById("btn-pre");
+	btn3.onclick = function(){
+	        num = (num +2)%3;
+	        audio.src =  "music/"+music[num]+".mp3";
+	        name.innerHTML = music[num];
+	        audio.play();
+	    }
+
+	<!--下一首-->
+	var btn4 = document.getElementById("btn-next");
+	btn4.onclick = function(){
+	        num = (num +1)%3;
+	        audio.src =  "music/"+music[num]+".mp3";
+	        name.innerHTML = music[num];
+	        audio.play();
+	    }</span>
+	[csharp] view plain copy
+	<span style="font-size:18px;"><span style="white-space:pre">    <!--自动播放下一首-->
+	<span style="white-space:pre">  </span>audio.addEventListener('ended', function () {
+	    btn4.onclick();
+	}, false);</span></span>
+</script>
+</body>
+</html>

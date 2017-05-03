@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>自己开始写俄罗斯方块</title>
+	<link rel="stylesheet" type="text/css" href="index3.css">
+</head>
+<body>
+	<div id="container">
+		<div id="display-area"></div>
+		<div id="control-area">
+			<div id="next">
+				<h3 class="next-tit">next:</h3>
+			</div>
+			<h3 class="score">score：<span id="score"></span></h3>
+	        <div class="highest">历史最高分：<span id="high"></span></div>
+	        <div class="btn">
+	            <button id="h-clear" class="clear">清空缓存</button>
+	            <button id="restart" class="clear">结束游戏</button><br>
+	            <button id="h-stop" class="stop">开始游戏</button>
+	        </div>
+		</div>
+	</div>
+	<script>
+		(function() {
+			// 生成16*10的网格
+			(function printGrids1(x,y) {
+				var displayArea=$("display-area");
+				var Tab=createGrids(x,y);
+				Tab.id="grids";
+				displayArea.appendChild(Tab);
+			})(16,10);
+			// 生成4*4的网格
+			(function printGrids2(x,y) {
+				var Next=$("next");
+				var Tab=createGrids(x,y);
+				Tab.id="next-block";
+				Next.appendChild(Tab);
+			})(4,4);
+
+			var block_now;
+			var timer//计时器
+			var speed=800;//方块下落速度
+			//用一个二维数组表示绘制的网格
+			//16*10的画布
+			var aTrs1=$("grids").getElementsByTagName("tr");
+			var ground = new Array();
+			for (var i = 0; i < 16; i++) {
+			    ground[i]=aTrs1[i].getElementsByTagName("td");
+			}
+			var beforeBlock = new Array();//16*10的方块 方块上一时刻的位置，用于擦除上一秒
+			for (var i = 0; i < 16; i++) {
+			        beforeBlock[i] = new Array();
+			}
+
+//-------------------------------------
+			//方块类
+			//把属性定义到方块对象上
+			function Block() {
+				this.dir=40;
+				this.end=0;
+				//方块左上角网格的位置,相当于方块的原点
+				this.pos=[0,3];
+				this.color=["#F53636","#3A65FC","#2DFBAA","#E0FC26"];
+			}
+			//把方法定义到方块对象的原型上
+			Block.prototype= {
+				//打印方块，最重要的程序
+				printBlock:function() {
+					for (var i = 0; i < 4; i++) {
+						for (var j = 0; j < 4; j++) {
+							//将方块打印到画布上
+							if(this.shape[i][j]) {
+								var x=i+this.pos[0];
+								var y=j+this.pos[1];
+								ground[x][y].style.backgroundColor=this.color;
+								beforeBlock[x][y]=1;
+							}
+						}
+					}
+				}
+			}
+			//定义7种类型的方块并继承Block
+			function Block_i() {
+				Block.call(this);
+				this.shape=[
+					[1,1,1,1],
+					[0,0,0,0],
+					[0,0,0,0],
+					[0,0,0,0]
+				];
+			}
+			Block_i.prototype = new Block();
+			function Block_s() {
+				Block.call(this);
+				this.shape=[
+					[0,1,1,0],
+					[1,1,0,0],
+					[0,0,0,0],
+					[0,0,0,0]
+				];
+			}
+			Block_s.prototype = new Block();
+			function Block_j() {
+				Block.call(this);
+				this.shape=[
+					[0,1,0,0],
+					[0,1,0,0],
+					[1,1,0,0],
+					[0,0,0,0]
+				];
+			}
+			Block_j.prototype = new Block();
+			function Block_o() {
+				Block.call(this);
+				this.shape=[
+					[0,1,1,0],
+					[0,1,1,0],
+					[0,0,0,0],
+					[0,0,0,0]
+				];
+			}
+			Block_o.prototype = new Block();
+			function Block_z() {
+				Block.call(this);
+				this.shape=[
+					[1,1,0,0],
+					[0,1,1,0],
+					[0,0,0,0],
+					[0,0,0,0]
+				];
+			}
+			Block_z.prototype = new Block();
+			function Block_t() {
+				Block.call(this);
+				this.shape=[
+					[1,1,1,0],
+					[0,1,0,0],
+					[0,0,0,0],
+					[0,0,0,0]
+				];
+			}
+			Block_t.prototype = new Block();
+			function Block_l() {
+				Block.call(this);
+				this.shape=[
+					[0,1,0,0],
+					[0,1,0,0],
+					[0,1,1,0],
+					[0,0,0,0]
+				];
+			}
+			Block_l.prototype = new Block();
+
+
+			//执行
+			function play() {
+				block_now=createBlock();
+				block_now.printBlock();
+				var x;	//x存储形状最下方所在的列
+				timer=setInterval(function() {
+					outerloop://命名外圈语句
+					for (var i = 3; i >= 0; i--) {
+						innerloop://命名内圈语句
+						for (var j = 0; j < 4; j++) {
+							//形状最下方所在的列
+							if(block_now.shape[i][j]) {
+								x=i+block_now.pos[0];
+								break outerloop;
+							}
+						}
+					}
+					if(x<15) {
+						block_now.pos[0]++;
+						block_now.printBlock();
+						清除下移留下的痕迹
+					}
+					else{
+						block_now.end=1;
+					}
+				},speed)
+			}
+			play();
+
+//-------------------工具函数--------------------------------
+			//清除下移痕迹
+			function clearBefore() {
+				
+			}
+
+			//随机产生一个方块
+			function createBlock() {//r1是下面产生的0~6的随机数
+				var block_new;
+				var r1=Math.round(Math.random()*6);
+				var r2=Math.round(Math.random()*3);
+				switch(r1) {
+					case 0 :block_new=new Block_i();break;
+					case 1 :block_new=new Block_j();break;
+					case 2 :block_new=new Block_l();break;
+					case 3 :block_new=new Block_o();break;
+					case 4 :block_new=new Block_s();break;
+					case 5 :block_new=new Block_t();break;
+					case 6 :block_new=new Block_z();break;
+				}
+				block_new.color=block_new.color[r2];
+				return block_new;
+			}
+			//定义$()函数
+			function $(ele) {
+				return document.getElementById(ele);
+			}
+			//产生指定行列的函数
+			function createGrids(row,col) {
+				var Tab=document.createElement("table");
+				var Tbody=document.createElement("tbody");
+				for (var i = 0; i < row; i++) {
+					var Trs=document.createElement("tr");
+					for (var j = 0; j < col; j++) {
+						 var Tds=document.createElement("td");
+						 Trs.appendChild(Tds);
+					}
+					Tbody.appendChild(Trs);
+				}
+				Tab.appendChild(Tbody);
+				return Tab;
+			}
+
+		})();
+	</script>
+</body>
+</html>
