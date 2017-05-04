@@ -12,7 +12,7 @@
 			<div id="next">
 				<h3 class="next-tit">next:</h3>
 			</div>
-			<h3 class="score">score：<span id="score"></span></h3>
+			<h3 class="score">score：<span id="myscore"></span></h3>
 	        <div class="highest">历史最高分：<span id="high"></span></div>
 	        <div class="btn">
 	            <button id="h-clear" class="clear">清空缓存</button>
@@ -40,6 +40,8 @@
 			var block_now;
 			var timer//计时器
 			var speed=800;//方块下落速度
+			var score=0;
+			var high=0;
 			//用一个二维数组表示绘制的网格
 			//16*10的画布
 			var aTrs1=$("grids").getElementsByTagName("tr");
@@ -79,6 +81,20 @@
 				printBlock:function() {
 					//先清除之前的方块
 					//然后判断是否超出边界
+					//右
+					var q;
+					loop1:
+					for (var i = 3; i >= 0; i--) {
+					    for (var j = 0; j < 4; j++) {
+					        if (this.shape[j][i]) {
+					            q = i+1;
+					            break loop1;
+					        }
+					    }
+					}
+					if ((this.pos[1]+q-10) >= 0) {
+					    this.pos[1] = 10-q;
+					}
 					//判断下边界
 					var p;
 					loop1:
@@ -92,8 +108,8 @@
 					}
 					if(this.pos[0]+p>=16) {
 						this.end=1;
-						clear(beforeBlock);
-						return;
+						// clear(beforeBlock);
+						// return;
 					}
 					clearBefore();
 					//判断左右是否有方块
@@ -195,23 +211,9 @@
 								break;
 							}
 							case 39: {
-								this.dir=39;
-								//右移条件判断
-								var q;
-								loop5:
-								for (var i = 3; i >= 0; i--) {
-									for (var j = 0; j < 4; j++) {
-										if(this.shape[j][i]) {
-											q=i;
-											break loop5;
-										}
-									}
-								}
-								//最右边的方块所在的列数
-								if (q+this.pos[1]<=8) {
-									this.pos[1]++;
-									this.printBlock();
-								}
+								this.dir = 39;
+								this.pos[1]++;
+								this.printBlock();
 								break;
 							}
 							case 40: {
@@ -386,6 +388,7 @@
 	                        play();
 	                    }
 					}
+					getScore()
 					// alert(block_now.pos[0]);
 					block_now.pos[0]++;
 				},speed);
@@ -445,7 +448,36 @@
 			        }
 			    }
 			}
-
+			//得到分数，并判断是否为历史最高分并写入缓存
+			function getScore() {
+			    var s;
+			    for (var i = 0; i < 16; i++) {
+			        s = 0;
+			        for (var j = 0; j < 10; j++) {
+			            if (allBlock[i][j]) {
+			                s++;
+			            }
+			        }
+			        if (s == 10) {
+			            score = score+1;
+			            allBlock.splice(i, 1);
+			            allBlock.unshift([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+			            clearBefore();
+			            for (var k = i; k > 0; k--) {
+			                for (var l = 0; l < 10; l++) {
+			                    ground[k][l].style.backgroundColor=ground[k-1][l].style.backgroundColor;
+			                    ground[k][l].style.zIndex=ground[k-1][l].zIndex;
+			                }
+			            }
+			        }
+			    }
+			    var myScore=$("myscore");
+			    myScore.innerHTML=score;
+			    if (high < score) {
+			        high = score;
+			        $(high).innerHTML=high;
+			    }
+			}
 //-------------------工具函数--------------------------------
 			//定义$()函数
 			function $(ele) {

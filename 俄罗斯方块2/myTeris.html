@@ -37,10 +37,9 @@
 				Tab.id="next-block";
 				Next.appendChild(Tab);
 			})(4,4);
-
 			var block_now;
 			var timer//计时器
-			var speed=800;//方块下落速度
+			var speed=200;//方块下落速度
 			//用一个二维数组表示绘制的网格
 			//16*10的画布
 			var aTrs1=$("grids").getElementsByTagName("tr");
@@ -50,8 +49,12 @@
 			}
 			var beforeBlock = new Array();//16*10的方块 方块上一时刻的位置，用于擦除上一秒
 			for (var i = 0; i < 16; i++) {
-			        beforeBlock[i] = new Array();
+			    beforeBlock[i] = new Array();
 			}
+			var allBlock = new Array();//16*10的方块 已完成方块
+			for (var i = 0; i < 16; i++) {
+		        allBlock[i] = new Array();
+		    }
 
 //-------------------------------------
 			//方块类
@@ -74,9 +77,20 @@
 								var x=i+this.pos[0];
 								var y=j+this.pos[1];
 								ground[x][y].style.backgroundColor=this.color;
+								ground[x][y].style.zIndex=1;
 								beforeBlock[x][y]=1;
 							}
 						}
+					}
+					//若方块下落完毕，将方块加入到已下落方块矩阵中
+					if (this.end == 1) {
+					    for (var i = 0; i < 4; i++) {
+					        for (var j = 0; j < 4; j++) {
+					            if(this.shape[i][j]) {
+					                allBlock[i + this.pos[0]][j + this.pos[1]] = 1;
+					            }
+					        }
+					    }
 					}
 				}
 			}
@@ -157,7 +171,8 @@
 			function play() {
 				block_now=createBlock();
 				block_now.printBlock();
-				var x;	//x存储形状最下方所在的列
+				var x;	//x存储形状最下方所在的行
+				var y;	//y存储形状最下方所在的列
 				timer=setInterval(function() {
 					outerloop://命名外圈语句
 					for (var i = 3; i >= 0; i--) {
@@ -166,26 +181,55 @@
 							//形状最下方所在的列
 							if(block_now.shape[i][j]) {
 								x=i+block_now.pos[0];
+								y=j+block_now.pos[1];
 								break outerloop;
 							}
 						}
 					}
+					//如果没有触底
 					if(x<15) {
 						block_now.pos[0]++;
+						//清除下移留下的痕迹
+						clearBefore();
 						block_now.printBlock();
-						清除下移留下的痕迹
+
 					}
+					//触底以后
 					else{
 						block_now.end=1;
+						for (var i = 0; i < 16; i++) {
+							for (var j = 0; j < 10; j++) {
+								if(!(allBlock[i][j]==1)) {
+									allBlock[i][j]=beforeBlock[i][j];
+								}
+							}
+						}
+						for (var i = 0; i < 16; i++) {
+							console.log(allBlock[i]);
+						}
+						clearInterval(timer);
+						play();
 					}
 				},speed)
 			}
 			play();
 
 //-------------------工具函数--------------------------------
+
 			//清除下移痕迹
 			function clearBefore() {
-				
+				outerloop://命名外圈语句
+				for (var i = 0; i < 16; i++) {
+					innerloop://命名内圈语句
+					for (var j = 0; j < 10; j++) {
+						//形状最下方所在的列
+						if(beforeBlock[i][j]) {
+							ground[i][j].style.backgroundColor="white";
+							ground[i][j].style.zIndex=0;
+							beforeBlock[i][j]=0;
+						}
+					}
+				}
 			}
 
 			//随机产生一个方块
